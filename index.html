@@ -468,6 +468,23 @@ body[data-document-page] .hero { display: none; }
 .lunch-table td { background: #fff; }
 .lunch-table tbody tr + tr > * { border-top: 1px solid #e0e5e8; }
 
+.lunch-picks { margin-top: 21px; padding-top: 17px; border-top: 1px solid #cbd4da; }
+.lunch-picker { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 9px 12px; padding: 11px 13px; border: 1px solid #d1d9de; border-radius: 8px; background: #f9fafb; }
+.lunch-picker strong { font-size: 14px; }
+.lunch-picker p { margin-top: 2px; color: #485863; font-size: 12px; line-height: 1.5; }
+.lunch-picker button { min-height: 42px; flex: none; padding: 7px 12px; border: 0; border-radius: 7px; background: #af3632; color: #fff; font-size: 13px; font-weight: 750; }
+.lunch-picker button:hover { background: #932824; }
+.lunch-places { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 9px 0 0; padding: 0; list-style: none; }
+.lunch-places li { padding: 7px 8px; border: 1px solid #d5dce1; border-radius: 6px; background: #fff; font-size: 13px; overflow-wrap: anywhere; }
+.lunch-places [data-picked] { border-color: #b04740; background: #fff1ed; color: #8c271f; font-weight: 720; }
+
+@media (max-width: 600px) {
+  .lunch-picks { margin-top: 16px; padding-top: 13px; }
+  .lunch-picker { padding: 9px; }
+  .lunch-places { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lunch-places li { font-size: 12px; }
+}
+
 @media (max-width: 600px) {
   .hero h1 { font-size: clamp(36px, 10vw, 54px); }
   .guide-lead { margin-bottom: 14px; }
@@ -620,7 +637,7 @@ body[data-document-page] .hero { display: none; }
         <article class="screen-feature" id="lunch-screen">
           <div class="screen-copy">
             <h3>오늘 뭐먹지?</h3>
-            <p>학생식당에 가기 전에 요일별 일품과 한식 메뉴를 살펴봐.</p>
+            <p>학생식당 식단을 보고, 밖에서 먹는 날엔 직원이 추천한 맛집을 한 곳 뽑아 봐.</p>
             <a class="feature-link" href="https://www.gist.ac.kr/kr/html/sub05/050601.html?mode=V&amp;no=224606">공식 식단표 보기 <span aria-hidden="true">↗</span></a>
           </div>
           <figure class="screen-capture">
@@ -642,6 +659,24 @@ body[data-document-page] .hero { display: none; }
                       </tbody>
                     </table>
                   </div>
+                  <section class="lunch-picks" aria-labelledby="lunch-picks-title">
+                    <div class="lunch-head"><h4 id="lunch-picks-title">직원 추천 맛집</h4><p>추천 맛집 9곳</p></div>
+                    <div class="lunch-picker">
+                      <div><strong>오늘은 어디로 갈까?</strong><p id="lunch-pick-result" role="status">추천 목록에서 한 곳을 무작위로 골라줘.</p></div>
+                      <button type="button" data-lunch-draw aria-controls="lunch-pick-result">한 곳 뽑기</button>
+                    </div>
+                    <ul class="lunch-places" aria-label="직원이 추천한 맛집 목록">
+                      <li>고창면옥</li>
+                      <li>광주댁김치찌개</li>
+                      <li>락락</li>
+                      <li>마녀의 닭갈비</li>
+                      <li>백운초밥</li>
+                      <li>생 어거스틴</li>
+                      <li>석거정</li>
+                      <li>정우림국밥</li>
+                      <li>호심씨부대찌개</li>
+                    </ul>
+                  </section>
                 </div>
               </div>
             </div>
@@ -724,6 +759,24 @@ body[data-document-page] .hero { display: none; }
   document.querySelector(".guide-document").hidden = false;
   document.body.dataset.documentPage = key;
   document.title = selected.name + " 문서함 | 뭐든G 물어봐!";
+})();
+
+(() => {
+  const button = document.querySelector("[data-lunch-draw]");
+  const result = document.getElementById("lunch-pick-result");
+  const places = Array.from(document.querySelectorAll(".lunch-places li"));
+  if (!button || !result || !places.length) return;
+
+  let picked;
+  button.addEventListener("click", () => {
+    const choices = places.length > 1 ? places.filter(place => place !== picked) : places;
+    const next = choices[Math.floor(Math.random() * choices.length)];
+    picked?.removeAttribute("data-picked");
+    next.setAttribute("data-picked", "");
+    picked = next;
+    result.textContent = "오늘의 추천 · " + picked.textContent.trim();
+    button.textContent = "다시 뽑기";
+  });
 })();
 </script>
 </body>
